@@ -54,7 +54,7 @@ codex-elementalis/
     <pre><code>cd codex-elementalis</code></pre>
   </li>
   <li>
-    Abra o ficheiro <code>index.html</code> no seu navegador web ou utilize a extensão <strong>Live Server</strong> no Visual Studio Code para execução em tempo real[cite: 3].
+    Abra o ficheiro <code>index.html</code> no seu navegador web ou utilize a extensão <strong>Live Server</strong> no Visual Studio Code para execução em tempo real.
   </li>
 </ol>
 
