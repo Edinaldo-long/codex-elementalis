@@ -60,8 +60,4 @@ codex-elementalis/
 
 <hr />
 
-<h2>👤 Autor</h2>
-<p>
-  Desenvolvido por <strong>Edinaldo Santos de Almeida</strong>[cite: 4]<br />
-  Perfil no GitHub: <a href="https://github.com/Edinaldo-long" target="_blank">@Edinaldo-long</a>[cite: 4]
-</p>
+
