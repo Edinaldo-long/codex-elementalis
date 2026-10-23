@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codex Elementalis - Tabela Periódica Rúnica Completa (118 Elementos)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=MedievalSharp&family=Philosopher:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+  <!-- Tela de abertura enquanto o login é verificado -->
+  <div class="auth-overlay" id="bootCover" style="z-index:1100">
+    <p id="bootMsg" style="color:#f1dfbb;font-family:'MedievalSharp',cursive;font-size:1.3rem;text-align:center">Abrindo o grimório…</p>
+  </div>
+
+  <!-- Login e cadastro do aluno -->
+  <div class="auth-overlay" id="authOverlay" hidden>
+    <div class="auth-card" role="dialog" aria-labelledby="authTitle">
+      <h2 id="authTitle">Codex Elementalis</h2>
+      <p class="auth-sub">Identifique-se para entrar no laboratório</p>
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab on" id="tabLogin">Entrar</button>
+        <button type="button" class="auth-tab" id="tabSignup">Criar conta</button>
+      </div>
+      <form id="authForm" novalidate>
+        <label class="auth-field" id="fieldNome" hidden>
+          <span>Seu nome</span>
+          <input id="inNome" type="text" autocomplete="name" maxlength="60">
+        </label>
+        <label class="auth-field" id="fieldTurma" hidden>
+          <span>Sua turma</span>
+          <input id="inTurma" type="text" maxlength="30" placeholder="Ex.: 1º A" autocomplete="off">
+        </label>
+        <label class="auth-field">
+          <span>E-mail</span>
+          <input id="inEmail" type="email" autocomplete="email" required>
+        </label>
+        <label class="auth-field">
+          <span>Senha</span>
+          <input id="inSenha" type="password" autocomplete="current-password" minlength="6" required>
+        </label>
+        <button class="auth-btn" id="btnAuth" type="submit">Entrar</button>
+      </form>
+      <button type="button" class="auth-link" id="btnReset">Esqueci minha senha</button>
+      <p class="auth-msg" id="authMsg" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <!-- Painel do professor -->
+  <div class="teacher-overlay" id="teacherOverlay" hidden>
+    <div class="teacher-wrap">
+      <div class="teacher-head">
+        <h2>Painel do Professor</h2>
+        <div class="t-actions">
+          <span id="tUser"></span>
+          <button type="button" class="mini-btn" id="btnTRefresh">Atualizar</button>
+          <button type="button" class="mini-btn" id="btnTLogout">Sair</button>
+        </div>
+      </div>
+
+      <section class="rpg-status-bar" style="justify-content:flex-start">
+        <div class="stat-badge"><span class="stat-icon">🧑‍🎓</span><div class="stat-info"><span class="stat-label">Alunos</span><span class="stat-value" id="tStudents">0</span></div></div>
+        <div class="stat-badge"><span class="stat-icon">⭐</span><div class="stat-info"><span class="stat-label">XP médio</span><span class="stat-value" id="tAvgXp">0</span></div></div>
+        <div class="stat-badge"><span class="stat-icon">⚗️</span><div class="stat-info"><span class="stat-label">Sínteses da turma</span><span class="stat-value" id="tCrafts">0</span></div></div>
+      </section>
+
+      <div class="auth-tabs t-tabs">
+        <button type="button" class="auth-tab on" id="tTabAlunos">Alunos</button>
+        <button type="button" class="auth-tab" id="tTabAtividade">Atividade recente</button>
+      </div>
+
+      <div class="t-panel" id="tPanelAlunos">
+        <div class="t-filter">
+          <label for="tFiltroTurma">Turma:</label>
+          <select id="tFiltroTurma"></select>
+        </div>
+        <div id="tAlunosLista"></div>
+      </div>
+      <div class="t-panel" id="tPanelAtividade" hidden>
+        <div class="t-filter">
+          <label for="tFiltro">Mostrar:</label>
+          <select id="tFiltro"></select>
+        </div>
+        <div id="tAtividadeLista"></div>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" class="mini-btn fx-sound-btn" id="fxSoundBtn" aria-pressed="true" title="Ligar ou desligar o som dos efeitos">🔊 Som</button>
+
+  <!-- Barra de sessão do aluno -->
+  <div class="session-bar" id="sessionBar" hidden>
+    <span>Alquimista: <strong id="sessionName"></strong></span>
+    <span class="save-state" id="saveState"></span>
+    <button type="button" class="mini-btn" id="btnLogout">Sair</button>
+  </div>
+
+  <header>
+    <h1>Codex Elementalis</h1>
+    <p class="subtitle">Tábua Sagrada dos 118 Elementos Rúnicos e Transmutações Arcanas</p>
+  </header>
+
+  <!-- Painel de Pontuações de RPG -->
+  <section class="rpg-status-bar">
+    <div class="stat-badge">
+      <span class="stat-icon">⭐</span>
+      <div class="stat-info">
+        <span class="stat-label">Pontos de Alquimia (XP)</span>
+        <span class="stat-value" id="scoreDisplay">0</span>
+      </div>
+    </div>
+
+    <div class="stat-badge">
+      <span class="stat-icon">📜</span>
+      <div class="stat-info">
+        <span class="stat-label">Nível de Mestria</span>
+        <span class="stat-value" id="rankDisplay">Iniciado</span>
+      </div>
+    </div>
+
+    <div class="stat-badge">
+      <span class="stat-icon">⚗️</span>
+      <div class="stat-info">
+        <span class="stat-label">Sínteses Realizadas</span>
+        <span class="stat-value" id="craftCountDisplay">0</span>
+      </div>
+    </div>
+
+    <div class="stat-badge">
+      <span class="stat-icon">🪙</span>
+      <div class="stat-info">
+        <span class="stat-label">Ouro Acumulado</span>
+        <span class="stat-value" id="goldDisplay">100 PO</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Grade dos 118 Elementos -->
+  <main class="table-container">
+    <div class="periodic-grid" id="grid"></div>
+  </main>
+
+  <!-- Caldeirão Alquímico -->
+  <section class="crucible-panel">
+    <div class="crucible-header">
+      <h2>Caldeirão Alquímico de Transmutação</h2>
+      <span id="formulaPreview" style="color: var(--gold); font-size: 1.15rem; font-weight: bold;">Fórmula: Vazia</span>
+    </div>
+
+    <div class="crucible-contents" id="crucibleList">
+      <span class="empty-msg">Nenhum reagente adicionado. Clique num elemento da tábua periódica para conjurar essências.</span>
+    </div>
+
+    <div class="crucible-actions">
+      <button class="btn btn-clear" id="btnClearCrucible">Esvaziar Caldeirão</button>
+      <button class="btn btn-synthesize" id="btnSynthesize">Transmutar Síntese</button>
+    </div>
+  </section>
+
+  <!-- Modal do Elemento com Seletor Integrado -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card">
+      <button class="modal-close" id="btnCloseModal">&times;</button>
+
+      <div class="modal-top">
+        <div class="modal-badge">
+          <span class="b-z" id="mZ">1</span>
+          <span class="b-rune" id="mRune">🜁</span>
+          <span class="b-symbol" id="mSymbol">H</span>
+        </div>
+        <div class="modal-header-text">
+          <div class="tag-row">
+            <span class="pill-tag" id="mCategory">Alcalino Instável</span>
+            <span class="pill-tag" id="mTier">Tier I</span>
+          </div>
+          <h3 id="mLatinName">HYDROGENIUM</h3>
+          <span class="vulgar-name" id="mVulgarName">Hidrogénio (Sopro Celestial)</span>
+        </div>
+      </div>
+
+      <div class="modal-grid">
+        <div class="info-card">
+          <h4>🔮 Afinidade Arcana &amp; Escola</h4>
+          <p id="mAfinity">Éter / Vento Arcano</p>
+        </div>
+        <div class="info-card">
+          <h4>🧪 Efeito Alquímico (Poções)</h4>
+          <p id="mPotion">Poção dos Saltos Leves e Alívio de Miasmas</p>
+        </div>
+        <div class="info-card">
+          <h4>⚔️ Forja &amp; Armas</h4>
+          <p id="mForge">Alivia em 40% o peso de mantos e elmos</p>
+        </div>
+        <div class="info-card">
+          <h4>⚠️ Risco de Transmutação</h4>
+          <p id="mRisk">Detonação violenta sob chamas mágicas</p>
+        </div>
+      </div>
+
+      <div class="lore-card">
+        <h5>📜 Registos do Antigo Mestre Alquimista</h5>
+        <span id="mLore">"O elemento primordial que pairava sobre as águas antes do primeiro verbo dos deuses alquimistas."</span>
+      </div>
+
+      <!-- SELETOR DE QUANTIDADE (– 1 +) -->
+      <div class="quantity-section">
+        <span class="label">⚗️ Quantidade a Adicionar:</span>
+        <div class="qty-controls">
+          <button type="button" class="qty-btn" id="btnMinus" title="Diminuir">-</button>
+          <div class="qty-box" id="qtyDisplay">1</div>
+          <button type="button" class="qty-btn" id="btnPlus" title="Aumentar">+</button>
+        </div>
+      </div>
+
+      <div class="modal-bottom">
+        <span class="price-tag" id="mPrice">Preço Médio nos Bazares: 15 PO</span>
+        <div class="bottom-actions">
+          <button class="btn btn-fechar" id="btnCancelModal">Retornar à Tabela</button>
+          <button class="btn btn-conjurar" id="btnConjure">✨ Conjurar Essência (+1)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1) Jogo: dados dos elementos, reações e efeitos (define window.RPG e window.FX) -->
+  <script src="jogo.js"></script>
+
+  <script>
+    // Aviso se o Firebase não carregar (sem internet ou arquivo aberto direto do disco)
+    setTimeout(function () {
+      if (!window.__fbReady) {
+        var m = document.getElementById('bootMsg');
+        if (m) m.textContent = location.protocol === 'file:'
+          ? 'Abra o jogo pelo endereço do site ou por http://localhost, não direto pelo arquivo.'
+          : 'Não consegui conectar ao servidor. Verifique a internet e recarregue a página.';
+      }
+    }, 8000);
+  </script>
+
+  <!-- 2) Login, salvamento e painel do professor (Firebase) -->
+  <script type="module" src="auth-painel.js"></script>
+
+  <script src="dados-atomicos.js"></script>
+  <script type="module" src="contas.js"></script>
+  <script src="verificar-email.js"></script>
+  <script src="ver-senha.js"></script>
+
+</body>
+</html>
